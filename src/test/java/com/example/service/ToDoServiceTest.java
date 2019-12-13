@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -45,8 +46,9 @@ public class ToDoServiceTest {
     @Test
     public void testGetToDoById() {
         ToDo toDo = new ToDo(1, "Todo Sample 1", true);
-        when(toDoRepository.findOne(1L)).thenReturn(toDo);
-        ToDo result = toDoService.getToDoById(1);
+        when(toDoRepository.findById(1L)).thenReturn(Optional.of(toDo));
+        Optional<ToDo> resultOpt = toDoService.getToDoById(1);
+        ToDo result = resultOpt.get();
         assertEquals(1, result.getId());
         assertEquals("Todo Sample 1", result.getText());
         assertEquals(true, result.isCompleted());

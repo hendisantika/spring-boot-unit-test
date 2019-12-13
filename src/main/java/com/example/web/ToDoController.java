@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ToDoController {
@@ -31,18 +32,20 @@ public class ToDoController {
     @RequestMapping(value = "/todo/{id}", method = RequestMethod.GET)
     public ResponseEntity<ToDo> getToDoById(@PathVariable("id") long id) throws ToDoException {
         logger.info("ToDo id to return " + id);
-        ToDo toDo = toDoService.getToDoById(id);
-        if (toDo == null || toDo.getId() <= 0) {
+        Optional<ToDo> toDoOpt = toDoService.getToDoById(id);
+        ToDo toDo = toDoOpt.get();
+        if (!toDoOpt.isPresent()) {
             throw new ToDoException("ToDo doesn´t exist");
         }
-        return new ResponseEntity<ToDo>(toDoService.getToDoById(id), HttpStatus.OK);
+        return new ResponseEntity<ToDo>(toDo, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/todo/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Response> removeToDoById(@PathVariable("id") long id) throws ToDoException {
         logger.info("ToDo id to remove " + id);
-        ToDo toDo = toDoService.getToDoById(id);
-        if (toDo == null || toDo.getId() <= 0) {
+        Optional<ToDo> toDoOpt = toDoService.getToDoById(id);
+        ToDo toDo = toDoOpt.get();
+        if (!toDoOpt.isPresent()) {
             throw new ToDoException("ToDo to delete doesn´t exist");
         }
         toDoService.removeToDo(toDo);
@@ -61,8 +64,9 @@ public class ToDoController {
     @RequestMapping(value = "/todo", method = RequestMethod.PATCH)
     public ResponseEntity<ToDo> updateToDo(@RequestBody ToDo payload) throws ToDoException {
         logger.info("Payload to update " + payload);
-        ToDo toDo = toDoService.getToDoById(payload.getId());
-        if (toDo == null || toDo.getId() <= 0) {
+        Optional<ToDo> toDoOpt = toDoService.getToDoById(payload.getId());
+        ToDo toDo = toDoOpt.get();
+        if (!toDoOpt.isPresent()) {
             throw new ToDoException("ToDo to update doesn´t exist");
         }
         return new ResponseEntity<ToDo>(toDoService.saveToDo(payload), HttpStatus.OK);
